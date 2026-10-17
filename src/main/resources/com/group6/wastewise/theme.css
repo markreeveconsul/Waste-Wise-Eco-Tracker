@@ -1,6 +1,6 @@
 .root { -fx-font-family: "Inter"; -fx-font-size: 12px; -fx-text-fill: #081c15; -fx-accent: #40916c; -fx-focus-color: #52b788; -fx-faint-focus-color: #52b78822; }
-.desktop { -fx-background-color: linear-gradient(to bottom right,#04100c,#081c15,#112a20); -fx-padding: 24; }
-.shell { -fx-background-color: #f3f6f3; -fx-background-radius: 16; -fx-border-color: #2d6a4f66; -fx-border-radius: 16; -fx-effect: dropshadow(gaussian,#00000055,24,0,0,10); }
+.desktop { -fx-background-color: transparent; -fx-padding: 0; }
+.shell { -fx-background-color: #f3f6f3; -fx-background-radius: 16; -fx-border-color: #2d6a4f66; -fx-border-radius: 16; }
 .label { -fx-text-fill: #081c15; }
 .mono { -fx-font-family: "Geist Mono"; }
 .muted { -fx-text-fill: #40916c; -fx-font-size: 11px; }
@@ -112,3 +112,55 @@
 
 .chart-legend { -fx-background-color: transparent; }
 
+
+/* Combined design: original overview, dedicated inventory workspace. */
+.primary { -fx-background-color: linear-gradient(to right,#059669,#047857); }
+.primary:hover { -fx-background-color: #10a475; }
+.logs-content { -fx-padding: 26 30; }
+.inventory-stat { -fx-background-color: white; -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #e1e8e2; -fx-padding: 18; }
+.stat-caption { -fx-text-fill: #2d6a4f; -fx-font-size: 11px; -fx-font-weight: bold; }
+.stat-value { -fx-font-size: 23px; -fx-font-weight: bold; -fx-text-fill: #081c15; }
+.total-stat { -fx-background-color: linear-gradient(to bottom right,#112a20,#1b4332); -fx-border-color: #2d6a4f; }
+.total-stat .stat-caption,.total-stat .muted { -fx-text-fill: #a7d8bb; }
+.total-stat .stat-value { -fx-text-fill: white; }
+.bio-stat { -fx-border-color: #e1e8e2 #e1e8e2 #e1e8e2 #10b981; -fx-border-width: 1 1 1 4; }
+.rec-stat { -fx-border-color: #e1e8e2 #e1e8e2 #e1e8e2 #0ea5e9; -fx-border-width: 1 1 1 4; }
+.res-stat { -fx-border-color: #e1e8e2 #e1e8e2 #e1e8e2 #f59e0b; -fx-border-width: 1 1 1 4; }
+.records-toolbar { -fx-background-color: white; -fx-background-radius: 16; -fx-border-color: #e1e8e2; -fx-border-radius: 16; -fx-padding: 14; }
+.records-heading { -fx-padding: 15 20; }
+.visible-weight { -fx-background-color: #d8f3dc; -fx-background-radius: 7; -fx-text-fill: #065f46; -fx-font-weight: bold; -fx-padding: 6 10; }
+.recent-heading { -fx-padding: 20; -fx-border-color: transparent transparent #e1e8e2 transparent; }
+.recent-row { -fx-padding: 13 20; -fx-border-color: transparent transparent #e1e8e277 transparent; -fx-alignment: center-left; }
+.recent-row:hover { -fx-background-color: #eaf0eb88; }
+.recent-name { -fx-font-size: 12px; -fx-font-weight: bold; }
+.recent-weight { -fx-font-size: 12px; -fx-font-weight: bold; }
+.category-pct { -fx-wrap-text: true; }
+.logs-content .ledger-footer { -fx-padding: 14 20; }
+.table-view .column-header .label { -fx-font-size: 10px; -fx-padding: 0 10; }
+
+/* Readability and accessible category shortcuts. */
+.root { -fx-font-size: 13px; }
+.muted { -fx-font-size: 12px; -fx-text-fill: #436451; }
+.table-cell { -fx-font-size: 13px; }
+.category-badge { -fx-font-size: 11px; }
+.recent-name,.recent-weight { -fx-font-size: 13px; }
+.side-label { -fx-font-size: 13px; }
+.side-muted { -fx-font-size: 11px; -fx-text-fill: #9ccdb0; }
+.nav-heading { -fx-font-size: 11px; -fx-text-fill: #88bb9d; }
+.hero-description { -fx-font-size: 12px; -fx-text-fill: #b7e4c7; }
+.category-pct,.hero-caption { -fx-font-size: 11px; -fx-text-fill: #a4d6b7; }
+.category-name { -fx-font-size: 12px; }
+.filter,.quiet { -fx-font-size: 12px; }
+.field-label,.validation-error { -fx-font-size: 12px; }
+.text-field { -fx-prompt-text-fill: #557461; }
+.stat-caption { -fx-font-size: 12px; }
+.card-link { -fx-padding: 1; -fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 1; -fx-border-radius: 17; -fx-background-radius: 17; -fx-content-display: graphic-only; }
+.card-link:hover .category-card { -fx-background-color: #163d2c; }
+.card-link:hover .inventory-stat { -fx-border-color: #40916c; }
+.card-link:focused { -fx-border-color: #52b788; -fx-border-width: 2; -fx-border-radius: 17; -fx-padding: 0; }
+.about-details { -fx-background-color: #f3f6f3; -fx-background-radius: 14; -fx-padding: 18; }
+.about-details .heap-text { -fx-text-fill: #166044; -fx-font-size: 12px; }
+
+.window-control { -fx-background-color: transparent; -fx-text-fill: #d8f3dc; -fx-font-size: 17px; -fx-min-width: 34; -fx-padding: 2 8; -fx-background-radius: 6; }
+.window-control:hover { -fx-background-color: #1b4332; }
+.window-close:hover { -fx-background-color: #b91c1c; -fx-text-fill: white; }
