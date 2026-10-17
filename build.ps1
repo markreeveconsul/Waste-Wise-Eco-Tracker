@@ -12,8 +12,6 @@ $sources = @(Get-ChildItem 'src/main/java' -Recurse -Filter '*.java' | ForEach-O
 & "$jdk/bin/javac.exe" --release 21 --module-path lib --add-modules javafx.controls -d build/classes @sources
 if ($LASTEXITCODE -ne 0) { throw 'Compilation failed.' }
 Copy-Item 'src/main/resources/*' 'build/classes' -Recurse -Force
-& "$jdk/bin/jar.exe" "-J-Djava.io.tmpdir=$PSScriptRoot/build" --create --file build/WasteWise.jar --main-class com.group6.wastewise.WasteWiseApp -C build/classes .
-if ($LASTEXITCODE -ne 0) { throw 'JAR packaging failed.' }
 if ($Test -or $UiTest) {
     $tests = @(Get-ChildItem 'src/test/java' -Recurse -Filter '*.java' | ForEach-Object FullName)
     & "$jdk/bin/javac.exe" --release 21 -cp build/classes -d build/test-classes @tests
@@ -25,4 +23,7 @@ if ($UiTest) {
     & "$jdk/bin/java.exe" --enable-native-access=javafx.graphics '-Djavafx.cachedir=build/javafx-cache' '-Dwastewise.snapshots=build/qa' --module-path lib --add-modules javafx.controls -cp build/classes com.group6.wastewise.WasteWiseApp --smoke-test
     if ($LASTEXITCODE -ne 0) { throw 'UI tests failed.' }
 }
+$artifact = 'build/WasteWise-' + (Get-Date -Format 'yyyyMMdd-HHmmssfff') + '.jar'
+& "$jdk/bin/jar.exe" "-J-Djava.io.tmpdir=$PSScriptRoot/build" --create --file $artifact --main-class com.group6.wastewise.WasteWiseApp -C build/classes .
+if ($LASTEXITCODE -ne 0) { throw 'JAR packaging failed.' }
 Write-Host 'Build ready: run Launch WasteWise.vbs or Demo WasteWise.vbs.'
