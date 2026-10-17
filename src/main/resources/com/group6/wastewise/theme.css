@@ -238,3 +238,27 @@
 .about-details { -fx-background-color: #050d09; }
 .about-details .heap-text { -fx-text-fill: #34d399; }
 .toast { -fx-background-color: #0b1d17; -fx-border-color: #1e4d3d; }
+
+/* Consistent rhythm, category colors, and compact records layout. */
+.page-header,.dark-workspace .page-header { -fx-padding: 20 30; -fx-min-height: 88; -fx-pref-height: 88; }
+.page-title,.dark-workspace .page-title { -fx-font-size: 22px; }
+.rec-text { -fx-text-fill: #22d3ee; }
+.rec-badge { -fx-background-color: #ecfeff; -fx-border-color: #a5f3fc; -fx-text-fill: #155e75; }
+.logs-content { -fx-padding: 16 30; }
+.dark-workspace .inventory-stat { -fx-padding: 12 14; }
+.dark-workspace .stat-value { -fx-font-size: 23px; }
+.stat-foot { -fx-padding: 6 0 0 0; }
+.stat-foot .label { -fx-font-size: 11px; }
+.distribution-card { -fx-padding: 10 16; }
+.distribution-legend .label { -fx-font-size: 11px; }
+.dark-workspace .records-toolbar { -fx-padding: 8; }
+.dark-workspace .records-heading { -fx-padding: 10 16; }
+.dark-workspace .ledger-footer { -fx-padding: 9 16; }
+.dark-workspace .quiet:disabled { -fx-opacity: .65; }
+.dark-workspace .table-view .arrow { -fx-background-color: #a9c1b5; }
+.dark-workspace .delete-button:hover SVGPath { -fx-stroke: #fda4af; }
+.dark-workspace .card-link:hover .inventory-stat { -fx-border-color: #34d399; }
+.dark-workspace .card-link:focused { -fx-border-color: #6ee7b7; }
+.dark-workspace .scroll-bar .thumb { -fx-background-color: #47675a; }
+.category-helper { -fx-font-size: 12px; }
+.about-details .progress-bar > .track { -fx-background-color: #143329; }
