@@ -7,7 +7,7 @@ A native JavaFX + CSS implementation of the supplied WasteWise HTML design. Uses
 1. Extract the entire ZIP to a folder. Keep `lib`, `build`, and `src` together.
 2. Install **JDK 21 or later** if needed. The project was tested on the installed JDK 26.0.1 with JavaFX 21.0.6, compiling for Java 21. JavaFX's Windows x64 libraries and the fonts are included.
 3. Double-click **Launch WasteWise.vbs** for an empty tracker, or **Demo WasteWise.vbs** for the five sample records from the HTML reference.
-4. Add records with **Add Waste Record**. Exit using the red window button or **Exit Java Program**.
+4. Add records with **Add Waste Record**. Exit using the top-right close button or **Exit Java Program**.
 
 These launchers open the application without a console window. If Windows Script Host is disabled, use PowerShell:
 
@@ -54,7 +54,7 @@ The build creates timestamped JAR files, and the launcher selects the newest one
 - Removal uses stable record IDs even after sorting or filtering. Undo restores the most recent deletion to its original list position. Another deletion replaces that undo target.
 - Sort table columns by clicking their headings.
 - Empty states, notifications, exit confirmation, real JVM heap usage.
-- Drag the title bar to move the window. Use the yellow/green controls to minimize/maximize; the lower-right grip resizes it. Minimum size: 1120 × 740.
+- Drag the title bar to move the window. Use the top-right minimize and maximize/restore controls; the lower-right grip resizes it. Minimum size: 1120 × 640 on a screen large enough to fit it.
 - Ctrl+K: search; Ctrl+N: add; Ctrl+Z: undo last deletion; Escape: dismiss dialog; Delete: remove selected table record.
 
 ## OOP structure
@@ -94,3 +94,8 @@ Third-party notices are in `licenses/`. JavaFX: GPL v2 with Classpath Exception;
 ## Readability and navigation polish
 
 Text and table rows use larger type with darker secondary text. The overview heading is now Collection Summary. The title bar contains only the application name, Quick Search and About; JavaFX, ArrayList, Java version and live JVM memory information are in About. Category cards on both screens are keyboard-focusable buttons: select one to open that category and clear stale search text. The Total Collection card shows all records. The rounded application border remains, without the outer frame.
+
+
+## Window controls
+
+The application starts windowed and adapts its initial size to the display. Top-right controls provide minimize, maximize/restore, full screen, and close. Double-click a non-button area of the title bar to maximize/restore. Press F11 to toggle full screen, or Escape to leave it. Maximize uses the monitor work area so the taskbar remains available. Drag the lower-right grip to resize a normal window.
