@@ -82,7 +82,7 @@ The proposal originally mentions Swing or console. Its Tools and Technologies se
 
 ## Verification
 
-`build.ps1 -Test` runs 35 model checks covering totals, categories, validation, searches, ID-based removal, undo, clearing and sample data. `-UiTest` additionally checks both screens, retained filters, visible/global totals, clearing filters, numeric sorting, sorted deletion/undo, the real JavaFX form, invalid input, adding, empty states, exit cancellation and window resizing. Ten screenshots are generated under `build/qa/` for visual review. Smoke mode uses its own temporary in-memory session.
+`build.ps1 -Test` runs 35 model checks covering totals, categories, validation, searches, ID-based removal, undo, clearing and sample data. `-UiTest` additionally checks both screens, retained filters, visible/global totals, clearing filters, numeric sorting, sorted deletion/undo, the real JavaFX form, invalid input, adding, empty states, exit cancellation and window resizing. Twelve screenshots are generated under `build/qa/` for visual review. Smoke mode uses its own temporary in-memory session.
 
 The packaged JAR was compiled and run locally. NetBeans itself has not been launched for verification. JavaFX 21 on JDK 26 emits a dependency deprecation warning about `sun.misc.Unsafe`; it did not prevent the tested application from running.
 
@@ -107,3 +107,9 @@ The EcoWise desktop HTML now guides the dark emerald sidebar, title bar, Segrega
 Records include global category percentages and a live weight-distribution bar, independent of table filtering. The add form shows examples for the selected category. Records scroll on smaller windows. Existing validation, sorting, delete/undo, keyboard shortcuts, and session-only storage remain functional. The HTML's placeholder analytics navigation and simulated runtime information are not included.
 
 Verification also checks global distribution percentages, zero-weight resets, dynamic category examples, and minimize/maximize/restore/full-screen controls.
+
+## Interface consistency fixes
+
+Aligned page heading sizes and spacing while retaining the light overview and dark records workspace. Recyclable colors now match across charts, badges, and labels. Records cards have stable heights, the distribution legend is compact, and the table footer fits at 1120 x 740; shorter windows retain scrolling. Long table values have tooltips, and sort indicators and delete controls have clearer contrast.
+
+The add dialog only reserves space for errors when needed, uses full-width category guidance, and focuses the first input. Quick Search returns to the search area. Dialog close buttons have accessible names. Exit messaging distinguishes an empty session from records that will be lost. Added native UI checks for compact footer visibility, scrolling at 1120 x 640, and validation dialog bounds.
