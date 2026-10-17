@@ -99,3 +99,11 @@ Text and table rows use larger type with darker secondary text. The overview hea
 ## Window controls
 
 The application starts windowed and adapts its initial size to the display. Top-right controls provide minimize, maximize/restore, full screen, and close. Double-click a non-button area of the title bar to maximize/restore. Press F11 to toggle full screen, or Escape to leave it. Maximize uses the monitor work area so the taskbar remains available. Drag the lower-right grip to resize a normal window.
+
+## EcoWise design update
+
+The EcoWise desktop HTML now guides the dark emerald sidebar, title bar, Segregation Logs, forms, confirmations, About panel, and notifications. The existing light Overview Dashboard retains its Collection Summary, category cards, donut chart, and recent activity. WasteWise branding and real window controls remain.
+
+Records include global category percentages and a live weight-distribution bar, independent of table filtering. The add form shows examples for the selected category. Records scroll on smaller windows. Existing validation, sorting, delete/undo, keyboard shortcuts, and session-only storage remain functional. The HTML's placeholder analytics navigation and simulated runtime information are not included.
+
+Verification also checks global distribution percentages, zero-weight resets, dynamic category examples, and minimize/maximize/restore/full-screen controls.
