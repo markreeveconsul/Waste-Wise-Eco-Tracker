@@ -58,6 +58,10 @@ public class WasteWiseApp extends Application {
     private final Button clearFilters = button("Clear filters", "quiet", this::clearFilters);
     private BorderPane workspacePane;
     private VBox logsPage;
+    private final ScrollPane logsScroll = new ScrollPane();
+    private final Canvas distribution = new Canvas(600, 10);
+    private final EnumMap<Category, Label> ratioLabels = new EnumMap<>(Category.class);
+    private final EnumMap<Category, Label> statShares = new EnumMap<>(Category.class);
     private Button overviewNav;
     private Button logsNav;
     private boolean showingLogs;
@@ -179,8 +183,9 @@ public class WasteWiseApp extends Application {
         nav.getChildren().add(label("MAIN WORKSPACE", "nav-heading mono"));
         overviewNav = navButton("Overview Dashboard", "grid", () -> showView(false));
         overviewNav.setId("nav-overview"); overviewNav.getStyleClass().add("nav-active");
-        HBox overviewGraphic = (HBox) overviewNav.getGraphic(); overviewGraphic.getChildren().addAll(spacer(), recordCount);
+
         logsNav = navButton("Segregation Logs", "layers", () -> showView(true)); logsNav.setId("nav-logs");
+        ((HBox)logsNav.getGraphic()).getChildren().addAll(spacer(),recordCount);
         nav.getChildren().addAll(overviewNav, logsNav, navButton("Log New Waste", "plus", this::openAddModal));
         VBox categories = new VBox(8); categories.getStyleClass().add("nav-section"); categories.getChildren().add(label("CATEGORIES FOCUS", "nav-heading mono"));
         for (Category c : Category.values()) {
@@ -203,11 +208,16 @@ public class WasteWiseApp extends Application {
         body.getStyleClass().add("body-content"); body.setId("overview-page"); body.getChildren().addAll(metrics(), recentActivity());
         scroll.setContent(body); scroll.setFitToWidth(true); scroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); scroll.getStyleClass().add("workspace-scroll");
         logsPage = ledger(); logsPage.setId("logs-page");
+        logsPage.setMinHeight(590);
+        logsScroll.setContent(logsPage); logsScroll.setFitToWidth(true); logsScroll.setFitToHeight(true);
+        logsScroll.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER); logsScroll.getStyleClass().add("workspace-scroll");
         workspacePane = new BorderPane(scroll); workspacePane.setTop(header); workspacePane.getStyleClass().add("workspace"); return workspacePane;
     }
     private void showView(boolean logs) {
         showingLogs = logs;
-        workspacePane.setCenter(logs ? logsPage : scroll);
+        workspacePane.setCenter(logs ? logsScroll : scroll);
+        workspacePane.getStyleClass().remove("dark-workspace");
+        if (logs) workspacePane.getStyleClass().add("dark-workspace");
         pageTitle.setText(logs ? "Segregation Logs" : "Overview Dashboard");
         pageSubtitle.setText(logs ? "Search, filter, and manage your collection records." : "Your collection at a glance. Every category, every kilogram.");
         overviewNav.getStyleClass().remove("nav-active"); logsNav.getStyleClass().remove("nav-active");
@@ -240,14 +250,40 @@ public class WasteWiseApp extends Application {
     }
     private HBox inventoryStats() {
         HBox stats = new HBox(14);
-        VBox all = column(10,label("TOTAL COLLECTION","stat-caption"),logsTotal,logsCount); all.getStyleClass().addAll("inventory-stat","total-stat");
+        VBox all = column(10,label("TOTAL COLLECTION","stat-caption"),logsTotal,statFoot(logsCount,label("All waste","muted"))); all.getStyleClass().addAll("inventory-stat","total-stat");
         stats.getChildren().add(categoryLink(all,null,"logs-all"));
         for (Category c : Category.values()) {
             Label value = label("0.0 kg","stat-value mono"), count = label("0 records","muted"); logWeights.put(c,value); logCounts.put(c,count);
-            VBox card = column(10,row(7,dot(c),label(c.toString(),"stat-caption")),value,count); card.getStyleClass().addAll("inventory-stat",c.style()+"-stat"); stats.getChildren().add(categoryLink(card,c,"logs-"+c.style()));
+            Label share = label("0.0%",c.style()+"-text mono"); statShares.put(c,share);
+            VBox card = column(10,row(7,dot(c),label(c.toString(),"stat-caption")),value,statFoot(count,share)); card.getStyleClass().addAll("inventory-stat",c.style()+"-stat"); stats.getChildren().add(categoryLink(card,c,"logs-"+c.style()));
         }
         for (Node n : stats.getChildren()) { Region card=(Region)n; card.setMinWidth(0); card.setPrefWidth(250); card.setMaxWidth(Double.MAX_VALUE); HBox.setHgrow(card,Priority.ALWAYS); }
         return stats;
+    }
+    private HBox statFoot(Label count, Label share) {
+        HBox foot = row(4,count,spacer(),share); foot.getStyleClass().add("stat-foot"); return foot;
+    }
+    private VBox distributionCard() {
+        FlowPane legend = new FlowPane(16,6);
+        for (Category c : Category.values()) {
+            Label value = label("",c.style()+"-text mono"); ratioLabels.put(c,value);
+            legend.getChildren().add(row(6,dot(c),value));
+        }
+        StackPane track = new StackPane(distribution); track.getStyleClass().add("distribution-track");
+        distribution.widthProperty().bind(track.widthProperty().subtract(4));
+        distribution.widthProperty().addListener((o,a,b) -> drawDistribution());
+        VBox card = column(10,label("STREAM WEIGHT DISTRIBUTION","distribution-title mono"),legend,track);
+        card.getStyleClass().add("distribution-card"); return card;
+    }
+    private void drawDistribution() {
+        double sum=tracker.calculateTotalWeight(), x=0;
+        GraphicsContext gc=distribution.getGraphicsContext2D(); gc.clearRect(0,0,distribution.getWidth(),10);
+        for (Category c : Category.values()) {
+            double share=sum==0?0:tracker.calculateCategoryWeight(c)/sum;
+            double width=share*distribution.getWidth(); gc.setFill(Color.web(color(c))); gc.fillRect(x,0,width,10); x+=width;
+            if (ratioLabels.containsKey(c)) ratioLabels.get(c).setText(c+String.format(Locale.US," (%.1f%%)",share*100));
+            if (statShares.containsKey(c)) statShares.get(c).setText(String.format(Locale.US,"%.1f%%",share*100));
+        }
     }
     private Button categoryLink(VBox content, Category category, String id) {
         Button link = button("", "card-link", () -> { showView(true); search.clear(); setFilter(category); });
@@ -345,7 +381,7 @@ public class WasteWiseApp extends Application {
         undo.setId("undo-button");
         HBox foot = row(10, footer, spacer(),label("Visible records weight", "muted"),visibleWeight); foot.getStyleClass().add("ledger-footer");
         ledger.getChildren().addAll(tableHeading, table, foot); VBox.setVgrow(ledger,Priority.ALWAYS);
-        VBox page = column(20, inventoryStats(),tools,ledger); page.getStyleClass().add("logs-content");
+        VBox page = column(16, inventoryStats(),distributionCard(),tools,ledger); page.getStyleClass().add("logs-content");
         return page;
     }
     private TableColumn<Waste,String> textColumn(String title, java.util.function.Function<Waste,String> value, double width) {
@@ -388,14 +424,14 @@ public class WasteWiseApp extends Application {
             logCounts.get(c).setText(countText);
             percentages.get(c).setText(percentages.get(c).getText() + "\n" + countText);
         }
-        refreshRecent(); refreshTable(); updateHeap();
+        drawDistribution(); refreshRecent(); refreshTable(); updateHeap();
     }
     private void updateHeap() {
         Runtime r = Runtime.getRuntime(); long used = r.totalMemory() - r.freeMemory();
         heapText.setText(String.format(Locale.US, "%.1f MB", used / 1048576.0)); heapBar.setProgress((double) used / r.maxMemory());
     }
     private void delete(Waste w) { if (tracker.removeWaste(w.getId())) { refresh(); toast("Record Deleted", "Removed \"" + w.getWasteName() + "\". Use Undo last delete to restore."); } }
-    private void undoDelete() { if (tracker.undoLastDelete()) { refresh(); toast("Restored", "Record restored to ArrayList memory."); } }
+    private void undoDelete() { if (tracker.undoLastDelete()) { refresh(); toast("Restored", "Record restored to your collection."); } }
 
     private void openAddModal() {
         if (overlay != null) return;
@@ -403,6 +439,12 @@ public class WasteWiseApp extends Application {
         ComboBox<Category> category = new ComboBox<>(FXCollections.observableArrayList(Category.values())); category.setPromptText("Choose category..."); category.setMaxWidth(Double.MAX_VALUE); category.setId("input-category");
         TextField weight = new TextField(); weight.setPromptText("0.5"); weight.setId("input-weight");
         TextField location = new TextField(); location.setPromptText("Cafeteria Bin A"); location.setId("input-location");
+        Label helper = label("Choose a category to see example items.", "category-helper"); helper.setWrapText(true); helper.setId("category-helper");
+        category.valueProperty().addListener((o,a,c) -> helper.setText(c == null ? "Choose a category to see example items." : switch(c) {
+            case BIODEGRADABLE -> "Examples: fruit peels, food scraps, leaves and garden waste.";
+            case RECYCLABLE -> "Examples: clean paper, cardboard, bottles and metal cans. Follow local collection rules.";
+            case RESIDUAL -> "Examples: used tissues, diapers and non-recyclable wrappers.";
+        }));
         Label error = label("", "validation-error"); error.setId("form-error"); error.setWrapText(true);
         VBox left = field("WEIGHT (kg)", weight), right = field("LOCATION / BIN", location); HBox.setHgrow(left,Priority.ALWAYS); HBox.setHgrow(right,Priority.ALWAYS);
         Button save = button("Add Waste Record", "primary", () -> {
@@ -413,7 +455,7 @@ public class WasteWiseApp extends Application {
                 refresh(); closeModal(); toast("Record Added", "Logged \"" + added.getWasteName() + "\" successfully.");
             } catch (IllegalArgumentException ex) { error.setText(ex.getMessage()); }
         }); save.setId("save-record"); save.setDefaultButton(true);
-        VBox card = column(18, modalHeader("Add Waste Item", "Record a collection for this session", "plus"), field("WASTE ITEM NAME", name), field("CATEGORY SELECT", category), new HBox(12,left,right), error, row(10, spacer(), button("Cancel", "quiet", this::closeModal), save));
+        VBox card = column(18, modalHeader("Add Waste Item", "Record a collection for this session", "plus"), field("WASTE ITEM NAME", name), column(8,field("WASTE CATEGORY", category),helper), new HBox(12,left,right), error, row(10, spacer(), button("Cancel", "quiet", this::closeModal), save));
         showModal(card); Platform.runLater(name::requestFocus);
     }
     private void openExitModal() {
@@ -421,7 +463,7 @@ public class WasteWiseApp extends Application {
         Label warning = label("Your records are stored only for this session. Closing the application will remove all logged waste records.", "warning-copy"); warning.setWrapText(true);
         VBox note = column(10, label("SESSION RECORDS WILL BE LOST", "warning-heading mono"), warning); note.getStyleClass().add("warning-note");
         Button exit = button("Exit application", "danger", () -> { tracker.clear(); stage.hide(); Platform.exit(); }); exit.setId("confirm-exit");
-        VBox card = column(20, modalHeader("Exit Program Confirmation", "Your session has not been saved", "power"), label("Are you sure you want to end the Java application session?", "muted"), note, row(10, spacer(), button("Cancel & Keep Running", "quiet", this::closeModal), exit));
+        VBox card = column(20, modalHeader("Exit Program Confirmation", "Your session has not been saved", "power"), label("Are you sure you want to end this tracking session?", "muted"), note, row(10, spacer(), button("Resume Tracking", "quiet", this::closeModal), exit));
         showModal(card);
     }
     private HBox modalHeader(String title, String subtitle, String icon) { HBox h = row(12, icon(icon,"#40916c",24), column(4,label(title,"modal-title"),label(subtitle,"muted")), spacer(), button("×","quiet",this::closeModal)); h.getStyleClass().add("modal-header"); return h; }
@@ -447,7 +489,7 @@ public class WasteWiseApp extends Application {
     private static HBox row(double gap, Node... nodes) { HBox box = new HBox(gap,nodes); box.setAlignment(Pos.CENTER_LEFT); return box; }
     private static VBox column(double gap, Node... nodes) { return new VBox(gap,nodes); }
     private static Region spacer() { Region r = new Region(); HBox.setHgrow(r,Priority.ALWAYS); return r; }
-    private static String color(Category c) { return switch(c) { case BIODEGRADABLE -> "#10b981"; case RECYCLABLE -> "#0ea5e9"; case RESIDUAL -> "#f59e0b"; }; }
+    private static String color(Category c) { return switch(c) { case BIODEGRADABLE -> "#10b981"; case RECYCLABLE -> "#06b6d4"; case RESIDUAL -> "#f59e0b"; }; }
     private static Circle dot(Category c) { return new Circle(4,Color.web(color(c))); }
     private static Node icon(String name,String color,double size) {
         String d = switch(name) {
@@ -475,12 +517,13 @@ public class WasteWiseApp extends Application {
             snapshot(dir.resolve("about.png")); ((Button)root.lookup("#about-done")).fire(); require(overlay==null,"About closes");
             search.setText("unmatched"); ((Button)root.lookup("#overview-rec")).fire();
             require(showingLogs && selectedCategory==Category.RECYCLABLE && search.getText().isEmpty() && table.getItems().size()==2,"Overview card filters and clears stale search");
-            ((Button)root.lookup("#logs-bio")).fire(); require(selectedCategory==Category.BIODEGRADABLE && table.getItems().size()==2,"Inventory category card filters");
-            ((Button)root.lookup("#logs-all")).fire(); require(selectedCategory==null && table.getItems().size()==5,"Total card clears filters");
+            ((Button)logsPage.lookup("#logs-bio")).fire(); require(selectedCategory==Category.BIODEGRADABLE && table.getItems().size()==2,"Inventory category card filters");
+            ((Button)logsPage.lookup("#logs-all")).fire(); require(selectedCategory==null && table.getItems().size()==5,"Total card clears filters");
             overviewNav.fire();
             require(!showingLogs && workspacePane.getCenter()==scroll,"Overview is initial screen");
-            logsNav.fire(); require(showingLogs && workspacePane.getCenter()==logsPage,"Dedicated logs navigation");
+            logsNav.fire(); require(showingLogs && workspacePane.getCenter()==logsScroll,"Dedicated logs navigation");
             snapshot(dir.resolve("logs.png"));
+            require(statShares.get(Category.RECYCLABLE).getText().equals("74.1%"),"Distribution uses global weights");
             require(table.getItems().size() == 5,"Demo records"); require(Math.abs(tracker.calculateTotalWeight()-2.7)<1e-9,"Demo total");
             search.setText("cafeteria"); require(table.getItems().size()==1,"Search location"); require(visibleWeight.getText().equals("0.4 kg"),"Filtered total");
             overviewNav.fire(); require(!showingLogs && search.getText().equals("cafeteria"),"Navigation preserves filters");
@@ -496,12 +539,14 @@ public class WasteWiseApp extends Application {
             openAddModal(); root.applyCss(); root.layout(); snapshot(dir.resolve("add-dialog.png"));
             ((TextField)root.lookup("#input-name")).setText("Test food");
             ((ComboBox<Category>)root.lookup("#input-category")).setValue(Category.BIODEGRADABLE);
+            require(((Label)root.lookup("#category-helper")).getText().contains("fruit peels"),"Category examples update");
             ((TextField)root.lookup("#input-weight")).setText("-2");
             ((TextField)root.lookup("#input-location")).setText("Test bin");
             ((Button)root.lookup("#save-record")).fire(); require(tracker.viewWaste().size()==5 && !((Label)root.lookup("#form-error")).getText().isEmpty(),"Invalid weight rejected");
             ((TextField)root.lookup("#input-weight")).setText("2"); ((Button)root.lookup("#save-record")).fire(); require(tracker.viewWaste().size()==6 && overlay==null,"Add via form");
             Waste last = tracker.viewWaste().get(5); delete(last); require(tracker.viewWaste().size()==5,"Delete"); undo.fire(); require(tracker.viewWaste().size()==6,"Undo");
             tracker.clear(); refresh(); toastArea.getChildren().clear(); snapshot(dir.resolve("empty.png")); require(table.getItems().isEmpty() && tracker.calculateTotalWeight()==0,"Empty state");
+            require(statShares.values().stream().allMatch(l -> l.getText().equals("0.0%")),"Empty distribution resets");
             openExitModal(); root.applyCss(); root.layout(); snapshot(dir.resolve("exit-dialog.png")); closeModal(); require(stage.isShowing(),"Exit cancellation");
             stage.setWidth(1120); stage.setHeight(740); tracker.loadDemoRecords(); refresh();
             PauseTransition resizeWait = new PauseTransition(Duration.millis(400));
