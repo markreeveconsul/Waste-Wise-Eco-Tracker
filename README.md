@@ -1,4 +1,4 @@
-# WasteWise Desktop — Group 6
+# WasteWise Desktop 
 
 A native JavaFX + CSS implementation of the supplied WasteWise HTML design. Uses real Java classes and an in-memory `ArrayList<Waste>`. No WebView, JavaScript, database, or network connection is used at runtime.
 
