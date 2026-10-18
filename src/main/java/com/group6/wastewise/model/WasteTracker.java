@@ -20,6 +20,18 @@ public final class WasteTracker {
         };
         wasteList.add(waste); nextId++; return waste;
     }
+    public Waste updateWaste(int id, String name, Category category, double weight, String location) {
+        if(category==null) throw new IllegalArgumentException("Choose a waste category.");
+        for(int i=0;i<wasteList.size();i++) if(wasteList.get(i).getId()==id) {
+            Waste updated=switch(category) {
+                case BIODEGRADABLE -> new BiodegradableWaste(id,name,weight,location);
+                case RECYCLABLE -> new RecyclableWaste(id,name,weight,location);
+                case RESIDUAL -> new ResidualWaste(id,name,weight,location);
+            };
+            wasteList.set(i,updated); return updated;
+        }
+        throw new IllegalArgumentException("This record is no longer available.");
+    }
     public List<Waste> viewWaste() { return List.copyOf(wasteList); }
     public double calculateTotalWeight() { return wasteList.stream().mapToDouble(Waste::getWeight).sum(); }
     public double calculateCategoryWeight(Category category) {

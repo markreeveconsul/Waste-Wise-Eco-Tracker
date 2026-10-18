@@ -262,3 +262,10 @@
 .dark-workspace .scroll-bar .thumb { -fx-background-color: #47675a; }
 .category-helper { -fx-font-size: 12px; }
 .about-details .progress-bar > .track { -fx-background-color: #143329; }
+.category-selected { -fx-background-color: #10b98122; -fx-border-color: #34d399; -fx-border-radius: 12; }
+.filter-selected { -fx-border-color: #34d399; -fx-border-width: 2; -fx-padding: 0; }
+.modal-card .invalid-field { -fx-border-color: #fb7185; -fx-border-width: 2; }
+.context-menu { -fx-background-color: #0b1d17; -fx-border-color: #1e4d3d; -fx-background-radius: 8; }
+.context-menu .menu-item .label { -fx-text-fill: #e4eee8; }
+.context-menu .menu-item:focused { -fx-background-color: #1e4d3d; }
+.modal-card .text-field.invalid-field:focused,.modal-card .combo-box.invalid-field:focused { -fx-border-color: #fb7185; }

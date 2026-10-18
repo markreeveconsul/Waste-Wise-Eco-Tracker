@@ -24,6 +24,16 @@ public final class WasteTrackerTest {
         t.removeWaste(bio.getId()); t.clear(); check(!t.undoLastDelete(),"Clear invalidates undo"); eq(t.calculateTotalWeight(),0);
         Waste tiny=t.addWaste("Small item",Category.RECYCLABLE,.001,"Lab"); eq(tiny.getWeight(),.001);
         t.clear(); t.loadDemoRecords(); eq(t.calculateTotalWeight(),2.7); t.loadDemoRecords(); check(t.viewWaste().size()==5,"Demo does not duplicate");
+        WasteTracker edits=new WasteTracker();
+        Waste original=edits.addWaste("Paper",Category.RECYCLABLE,1,"Office");
+        Waste changed=edits.updateWaste(original.getId(),"Food",Category.BIODEGRADABLE,2,"Kitchen");
+        check(changed.getId()==original.getId() && edits.viewWaste().size()==1,"Edit preserves ID and count");
+        check(changed instanceof BiodegradableWaste,"Edit changes category subclass"); eq(edits.calculateTotalWeight(),2);
+        reject(()->edits.updateWaste(original.getId(),"Invalid",Category.RESIDUAL,-1,"Bin"));
+        check(edits.viewWaste().get(0)==changed,"Invalid edit is atomic");
+        reject(()->edits.updateWaste(999,"Missing",Category.RESIDUAL,1,"Bin"));
+        edits.removeWaste(changed.getId()); edits.undoLastDelete(); check(edits.viewWaste().get(0)==changed,"Undo restores edited record");
+        check(edits.addWaste("Next",Category.RESIDUAL,1,"Bin").getId()==original.getId()+1,"Edit does not consume next ID");
         System.out.println("PASS: " + checks + " model checks");
     }
     private static void check(boolean value,String message) { checks++; if(!value) throw new AssertionError(message); }

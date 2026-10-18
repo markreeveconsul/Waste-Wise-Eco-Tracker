@@ -113,3 +113,13 @@ Verification also checks global distribution percentages, zero-weight resets, dy
 Aligned page heading sizes and spacing while retaining the light overview and dark records workspace. Recyclable colors now match across charts, badges, and labels. Records cards have stable heights, the distribution legend is compact, and the table footer fits at 1120 x 740; shorter windows retain scrolling. Long table values have tooltips, and sort indicators and delete controls have clearer contrast.
 
 The add dialog only reserves space for errors when needed, uses full-width category guidance, and focuses the first input. Quick Search returns to the search area. Dialog close buttons have accessible names. Exit messaging distinguishes an empty session from records that will be lost. Added native UI checks for compact footer visibility, scrolling at 1120 x 640, and validation dialog bounds.
+
+## Record workflow improvements
+
+Each table row has an Edit action. Editing validates all fields before replacing the record, preserving its ID and list position even when its category changes. Invalid edits leave the original record intact. Add and edit forms highlight invalid fields, display correction guidance, and focus the first error.
+
+Save & add another opens a fresh form with the previous location retained. Typing in Location suggests locations used in the current session. The active category is reflected in the sidebar and summary cards. Empty search results offer Clear filters, while an empty collection offers Add your first record. Deletion notifications include Undo; the persistent Undo control remains available after a notification expires.
+
+Weights use up to three decimal places, retaining at least one; amounts below 0.001 kg use scientific notation so positive values never display as zero. Drag any non-button area of the title bar to move the window in windowed mode. The drag remains active until mouse release, even when the pointer crosses a title-bar control.
+
+Verification: 43 model checks, including atomic editing, category changes, preserved IDs, and undo of edited records. Native UI checks also cover editing, batch entry, retained location, category highlighting, empty-search recovery, toast Undo, tiny weight formatting, title-bar drag events, compact layouts, and window controls.
